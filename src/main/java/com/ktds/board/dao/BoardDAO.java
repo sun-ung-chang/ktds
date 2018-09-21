@@ -7,6 +7,7 @@ import com.ktds.board.vo.BoardVO;
 
 public interface BoardDAO {
 
+	//안녕
 	public int insertBoard(BoardVO boardVO);
 	
 	public int updateBoard(BoardVO boardVO);
