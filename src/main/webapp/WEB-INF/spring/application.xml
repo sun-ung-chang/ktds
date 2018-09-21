@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+
+	<!-- 공통기능 클래스 AOP에 사용된 -->
+	<bean 	id="daoParamAop"
+			class="com.ktds.common.aop.DaoParamAop">	
+			
+	</bean>
+	<aop:config>
+		<aop:aspect id="daoAspect" ref="daoParamAop">
+			<aop:pointcut 	expression="execution( * com.ktds..dao.*DAOImpl.*(..))" 
+							id="daoPointCut"/>
+			<aop:around method="getParam" pointcut-ref="daoPointCut"/>
+		</aop:aspect>
+	</aop:config>
+
+
+
+	<context:component-scan base-package="com.ktds"></context:component-scan>
+	<mvc:annotation-driven />
+	
+	
+	<!-- static resource  -->
+	<mvc:resources location="/WEB-INF/static/js/" mapping="/js/**" />
+	<mvc:resources location="/WEB-INF/static/css/" mapping="/css/**" />
+	<mvc:resources location="/WEB-INF/static/img/" mapping="/img/**" />
+	
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/board/**"/>
+				<bean	id="sessionInterceptor"
+						class="com.ktds.common.SessionInterceptor">
+				</bean>
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/member/**"/>
+			<mvc:exclude-mapping path="/member/logout"/>
+				<bean	id="preventSessionInterceptor"
+						class="com.ktds.common.PreventSessionInterceptor">
+				</bean>
+		</mvc:interceptor>
+		<!-- <mvc:interceptor>
+	    	<mvc:mapping path="/**"/>
+	    	<bean id="xssInterceptor" class="com.ktds.common.interceptor.XssInterceptor" />
+	    	
+	    </mvc:interceptor> -->
+	</mvc:interceptors>	
+	
+	<bean	id="localValidatorBean"
+			class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+	</bean>
+	<!-- 여기에게다가 적어야 bean에 적재됨 -->
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/view/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+
+
+
+	
+	<bean	id="multipartResolver"
+			class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+			<property name="maxUploadSize" value="104857600"></property>
+			<property name="defaultEncoding" value="UTF-8" ></property>
+	</bean>
+
+
+
+</beans>
